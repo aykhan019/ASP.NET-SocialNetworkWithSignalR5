@@ -14,16 +14,21 @@ namespace SocialNetworkWithSignalR.Controllers
         private RoleManager<CustomIdentityRole> _roleManager;
         private SignInManager<CustomIdentityUser> _signInManager;
         private readonly IWebHostEnvironment _webhost;
-
+        private IHttpContextAccessor httpContextAccessor;
+        private CustomIdentityDbContext _dbContext;
         public AccountController(UserManager<CustomIdentityUser> userManager,
             RoleManager<CustomIdentityRole> roleManager,
             SignInManager<CustomIdentityUser> signInManager,
-            IWebHostEnvironment webhost)
+            IWebHostEnvironment webhost,
+            CustomIdentityDbContext dbContext,
+            IHttpContextAccessor httpContextAccessor)
         {
             _userManager = userManager;
             _roleManager = roleManager;
             _signInManager = signInManager;
             _webhost = webhost;
+            _dbContext = dbContext;
+            this.httpContextAccessor = httpContextAccessor;
         }
 
         // GET: AccountController
@@ -86,13 +91,20 @@ namespace SocialNetworkWithSignalR.Controllers
         }
 
         [HttpPost]
-        public ActionResult Login(LoginViewModel model)
+        public async Task<ActionResult> Login(LoginViewModel model)
         {
             if (ModelState.IsValid)
             {
                 var result = _signInManager.PasswordSignInAsync(model.Username, model.Password, model.RememberMe, false).Result;
                 if (result.Succeeded)
                 {
+                    var user = _dbContext.Users.SingleOrDefault(u => u.UserName == model.Username);
+                    if (user != null)
+                    {
+                    user.ConnectTime = DateTime.Now.ToLongDateString() + DateTime.Now.ToLongTimeString();
+                    _dbContext.Users.Update(user);
+                    await _dbContext.SaveChangesAsync();
+                    }
                     return RedirectToAction("Index", "Home");
                 }
                 ModelState.AddModelError("", "Invalid Login");
@@ -101,9 +113,13 @@ namespace SocialNetworkWithSignalR.Controllers
         }
 
 
-        public IActionResult LogOut()
+        public async Task<IActionResult> LogOut()
         {
             _signInManager.SignOutAsync().Wait();
+            var user = await _userManager.GetUserAsync(HttpContext.User);
+            user.DisConnectTime = DateTime.Now;
+            _dbContext.Users.Update(user);
+            await _dbContext.SaveChangesAsync();
             return RedirectToAction("Login", "Account");
         }
     }
