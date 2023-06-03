@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using SocialNetworkWithSignalR.Entities;
 using SocialNetworkWithSignalR.Models;
 using System.Diagnostics;
 
@@ -8,27 +10,26 @@ namespace SocialNetworkWithSignalR.Controllers
     [Authorize(Roles ="Admin")]
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
+        private UserManager<CustomIdentityUser> _userManager;
+        private  IHttpContextAccessor httpContextAccessor;
+        private CustomIdentityDbContext _dbContext;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(UserManager<CustomIdentityUser> userManager,
+            IHttpContextAccessor httpContextAccessor,
+            CustomIdentityDbContext dbContext)
         {
-            _logger = logger;
+            _userManager = userManager;
+            this.httpContextAccessor = httpContextAccessor;
+            _dbContext = dbContext;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
+            var user=await _userManager.GetUserAsync(HttpContext.User);
+            ViewBag.User = user;
             return View();
         }
 
-        public IActionResult Privacy()
-        {
-            return View();
-        }
-
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-        }
+      
     }
 }
