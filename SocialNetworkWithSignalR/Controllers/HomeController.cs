@@ -30,6 +30,12 @@ namespace SocialNetworkWithSignalR.Controllers
             return View();
         }
 
+        public async Task<IActionResult> GetAllUsers()
+        {
+            var user = await _userManager.GetUserAsync(HttpContext.User);
+            var users = _dbContext.Users.Where(u=>u.Id!=user.Id).OrderByDescending(x => x.IsOnline);
+            return Ok(users);
+        }
       
     }
 }

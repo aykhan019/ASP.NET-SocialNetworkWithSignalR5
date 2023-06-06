@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using SocialNetworkWithSignalR.Entities;
+using SocialNetworkWithSignalR.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,6 +18,7 @@ builder.Services.AddIdentity<CustomIdentityUser,CustomIdentityRole>()
     .AddEntityFrameworkStores<CustomIdentityDbContext>()
     .AddDefaultTokenProviders();
 
+builder.Services.AddSignalR();
 
 var app = builder.Build();
 
@@ -36,8 +38,14 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapControllerRoute("Default", "{controller=Home}/{action=Index}/{id?}");
+    endpoints.MapHub<ChatHub>("/chathub");
+});
+
+//app.MapControllerRoute(
+//    name: "default",
+//    pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();
