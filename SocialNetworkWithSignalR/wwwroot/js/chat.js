@@ -11,26 +11,35 @@ connection.start().then(function () {
 
 connection.on("Connect", function (info) {
     var li = document.createElement("li");
-    document.getElementById("messagesList").appendChild(li);
-    li.innerHTML = `<span style='color:springgreen;'>${info}</span>`;
+    //document.getElementById("messagesList").appendChild(li);
+    //li.innerHTML = `<span style='color:springgreen;'>${info}</span>`;
     GetAllUsers();
 })
 
 connection.on("Disconnect", function (info) {
     var li = document.createElement("li");
-    document.getElementById("messagesList").appendChild(li);
-    li.innerHTML = `<span style='color:red;'>${info}</span>`;
+    //document.getElementById("messagesList").appendChild(li);
+    //li.innerHTML = `<span style='color:red;'>${info}</span>`;
     GetAllUsers();
 })
 
 connection.on("ReceiveNotification", function () {
-    alert("Accepted");
     GetMyRequests();
 })
 
-GetMyRequests();
+
+connection.on("ReceiveNotification2", function () {
+    GetMyRequests();
+    GetAllUsers();
+})
+
+
 
 async function SendFollowCall(id) {
     await connection.invoke("SendFollow", id);
 }
 
+async function SendDeclineCall(id) {
+    GetMyRequests();
+    await connection.invoke("DeclineNotification", id);
+}

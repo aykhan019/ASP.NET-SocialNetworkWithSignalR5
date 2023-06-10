@@ -13,6 +13,25 @@ function SendRequest(id) {
         Your friend request sent successfully
 </div>`;
             SendFollowCall(id);
+            GetAllUsers();
+            $("#request").html(item);
+        },
+        error: function (err) {
+            console.log(err);
+        }
+    })
+}
+
+function DeclineRequest(id,senderId) {
+    $.ajax({
+        url: `/Home/DeclineRequest/${id}`,
+        method: "GET",
+        success: function (data) {
+            let item = `<div class="alert alert-danger">
+        You decline request.
+</div>`;
+            SendDeclineCall(senderId);
+            GetAllUsers();
             $("#request").html(item);
         },
         error: function (err) {
@@ -33,7 +52,7 @@ function GetMyRequests() {
                 if (data[i].status == "Request") {
                     subContent = `<div class='card-body'>
                     <button class='btn btn-success'>Accept</button>
-                    <button class='btn btn-outline-secondary'>Decline</button>
+                    <button class='btn btn-outline-secondary' onclick="DeclineRequest(${data[i].id},'${data[i].senderId}')">Decline</button>
                         </div>`;
                 }
                 else {
@@ -60,6 +79,8 @@ ${subContent}
     })
 }
 
+GetMyRequests();
+
 function GetAllUsers() {
 
 
@@ -74,8 +95,12 @@ function GetAllUsers() {
                 let dateContent = '';
 
                 let subContent = "";
-
+                if (data[i].hasRequestPending) {
+                    subContent = `<button class='btn btn-outline-secondary'>Already Sent</button>`;
+                }
+                else {
                 subContent = `<button onclick="SendRequest('${data[i].id}')" class='btn btn-outline-primary'> Follow</button>`
+                }
 
                 let style = '';
                 if (data[i].isOnline) {

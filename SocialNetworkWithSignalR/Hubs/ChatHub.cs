@@ -47,7 +47,12 @@ namespace SocialNetworkWithSignalR.Hubs
 
         public async Task SendFollow(string id)
         {
-            await Clients.Others.SendAsync("ReceiveNotification");
+            await Clients.Users(new String[] { id}).SendAsync("ReceiveNotification");
         }
+        public async Task DeclineNotification(string id)
+        {
+            await Clients.Users(new String[] { id }).SendAsync("ReceiveNotification2");
+        }
+        
     }
 }
