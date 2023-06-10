@@ -22,3 +22,15 @@ connection.on("Disconnect", function (info) {
     li.innerHTML = `<span style='color:red;'>${info}</span>`;
     GetAllUsers();
 })
+
+connection.on("ReceiveNotification", function () {
+    alert("Accepted");
+    GetMyRequests();
+})
+
+GetMyRequests();
+
+async function SendFollowCall(id) {
+    await connection.invoke("SendFollow", id);
+}
+

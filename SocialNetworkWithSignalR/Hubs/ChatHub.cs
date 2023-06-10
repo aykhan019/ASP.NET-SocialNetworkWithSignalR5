@@ -44,5 +44,10 @@ namespace SocialNetworkWithSignalR.Hubs
             string info = user.UserName + " disconnected";
             await Clients.Others.SendAsync("Disconnect", info);
         }
+
+        public async Task SendFollow(string id)
+        {
+            await Clients.Others.SendAsync("ReceiveNotification");
+        }
     }
 }
