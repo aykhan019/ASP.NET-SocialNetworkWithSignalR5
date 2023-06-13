@@ -112,6 +112,43 @@ namespace SocialNetworkWithSignalR.Controllers
         }
 
 
+        public async Task<IActionResult> AcceptRequest(string userId,int requestId)
+        {
+            var receiverUser = await _userManager.Users.FirstOrDefaultAsync(u => u.Id == userId);
+            var sender = await _userManager.GetUserAsync(HttpContext.User);
+
+            if (receiverUser != null)
+            {
+                receiverUser.FriendRequests.Add(new FriendRequest
+                {
+                     Content=$"{sender.UserName} accepted friend request at ${DateTime.Now.ToLongDateString()}",
+                     SenderId=sender.Id,
+                     CustomIdentityUser=sender,
+                     Status="Notification",
+                     ReceiverId=receiverUser.Id
+                });
+
+                var receiverFriend = new Friend
+                {
+                    OwnId = receiverUser.Id,
+                    YourFriendId = sender.Id
+                };
+
+                _dbContext.Friends.Add(receiverFriend);
+
+                var request = await _dbContext.FriendRequests.FirstOrDefaultAsync(r=>r.Id==requestId);
+                _dbContext.FriendRequests.Remove(request);
+
+                await _userManager.UpdateAsync(receiverUser);
+                await _userManager.UpdateAsync(sender);
+
+                await _dbContext.SaveChangesAsync();
+
+            }
+            return Ok();
+        }
+
+
 
     }
 }
