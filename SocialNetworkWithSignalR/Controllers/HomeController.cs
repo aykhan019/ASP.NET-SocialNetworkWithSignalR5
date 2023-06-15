@@ -53,6 +53,7 @@ namespace SocialNetworkWithSignalR.Controllers
             }
             return Ok();
         }
+        public async Task<IActionResult> GetMyFriends()
         public async Task<IActionResult> GetAllUsers()
         {
             var user = await _userManager.GetUserAsync(HttpContext.User);
