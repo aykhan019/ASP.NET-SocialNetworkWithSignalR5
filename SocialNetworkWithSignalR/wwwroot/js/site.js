@@ -49,6 +49,7 @@ function AcceptRequest(id, requestId) {
             let item = `<div class="alert alert-success">
         You accept request successfully.
 </div>`;
+            SendFollowCall(id);
             GetMyRequests();
             GetAllUsers();
             $("#request").html(item);
@@ -59,6 +60,22 @@ function AcceptRequest(id, requestId) {
     })
 }
 
+
+function DeleteRequest(id, requestId) {
+    $.ajax({
+        url: `/Home/DeleteRequest?requestId=` + requestId,
+        method: "GET",
+        success: function (data) {
+            SendFollowCall(id);
+            GetMyRequests();
+            GetAllUsers();
+            $("#request").html("");
+        },
+        error: function (err) {
+            console.log(err);
+        }
+    })
+}
 
 
 function GetMyRequests() {
@@ -78,7 +95,7 @@ function GetMyRequests() {
                 }
                 else {
                     subContent = `<div class='card-body' >
-                            <button class='btn btn-warning'>Delete </button>
+                            <button onclick="DeleteRequest('${data[i].receiverId}',${data[i].id})" class='btn btn-warning'>Delete </button>
 </div>`;
                 }
 
@@ -119,8 +136,16 @@ function GetAllUsers() {
                 if (data[i].hasRequestPending) {
                     subContent = `<button class='btn btn-outline-secondary'>Already Sent</button>`;
                 }
+
                 else {
+                    if (data[i].isFriend) {
+
+                subContent = `<button  class='btn btn-outline-secondary'> UnFollow</button>`
+                    }
+                    else {
+
                 subContent = `<button onclick="SendRequest('${data[i].id}')" class='btn btn-outline-primary'> Follow</button>`
+                    }
                 }
 
                 let style = '';
