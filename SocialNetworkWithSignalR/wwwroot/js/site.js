@@ -122,6 +122,33 @@ ${subContent}
 
 GetMyRequests();
 
+
+function GetFriends() {
+
+    $.ajax({
+        url: "/Home/GetMyFriends",
+        method: "GET",
+        success: function (data) {
+            console.log(data);
+            let content = "";
+            for (var i = 0; i < data.length; i++) {
+                let css = 'border:3px solid springgreen';
+                if (!data[i].yourFriend.isOnline) {
+                    css = 'border:3px solid red';
+                }
+                let item = `<section style='display:flex;'>
+        <img style='width:60px;height:60px;border-radius:50%;${css}' src='/images/${data[i].yourFriend.imageUrl}'/>
+       <h4>${data[i].yourFriend.userName}</h4>
+</section>`
+                content += item;
+            }
+
+            $("#friends").html(content);
+        }
+    })
+
+}
+
 function GetAllUsers() {
 
     $.ajax({
@@ -181,6 +208,7 @@ ${subContent}
             }
 
             $("#allusers").html(content);
+            GetFriends();
         }
     })
 

@@ -53,7 +53,17 @@ namespace SocialNetworkWithSignalR.Controllers
             }
             return Ok();
         }
+
         public async Task<IActionResult> GetMyFriends()
+        {
+            var user = await _userManager.GetUserAsync(HttpContext.User);
+            var myFriends=await _dbContext.Friends
+                .Include(nameof(Friend.YourFriend)).ToListAsync();
+            var result = myFriends.Where(f => f.OwnId == user.Id);
+
+            return Ok(result);
+        }
+
         public async Task<IActionResult> GetAllUsers()
         {
             var user = await _userManager.GetUserAsync(HttpContext.User);
@@ -156,6 +166,14 @@ namespace SocialNetworkWithSignalR.Controllers
                     YourFriendId = sender.Id
                 };
 
+
+                var senderFriend = new Friend
+                {
+                    OwnId = sender.Id,
+                    YourFriendId = receiverUser.Id
+                };
+
+                _dbContext.Friends.Add(senderFriend);
                 _dbContext.Friends.Add(receiverFriend);
 
                 var request = await _dbContext.FriendRequests.FirstOrDefaultAsync(r=>r.Id==requestId);
