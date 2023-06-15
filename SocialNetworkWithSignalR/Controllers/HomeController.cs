@@ -56,11 +56,14 @@ namespace SocialNetworkWithSignalR.Controllers
         public async Task<IActionResult> GetAllUsers()
         {
             var user = await _userManager.GetUserAsync(HttpContext.User);
-            var users = _dbContext.Users.Include(nameof(CustomIdentityUser.FriendRequests)).Where(u => u.Id != user.Id).OrderByDescending(x => x.IsOnline);
-            var allRequests = _dbContext.FriendRequests.ToList();
-            var myrequests = allRequests.Where(f => f.SenderId == user.Id);
+            var users = await _dbContext.Users.Include(nameof(CustomIdentityUser.FriendRequests))
+                .Where(u => u.Id != user.Id)
+                .OrderByDescending(x => x.IsOnline)
+                .ToListAsync();
+            var allRequests =await _dbContext.FriendRequests.ToListAsync();
+            var myrequests =  allRequests.Where(f => f.SenderId == user.Id);
 
-            var myfriends=_dbContext.Friends.Where(f=>f.OwnId==user.Id || f.YourFriendId==user.Id);
+            var myfriends=await _dbContext.Friends.Where(f=>f.OwnId==user.Id || f.YourFriendId==user.Id).ToListAsync();
 
             foreach (var item in users)
             {
@@ -69,13 +72,13 @@ namespace SocialNetworkWithSignalR.Controllers
                 {
                     item.HasRequestPending = true;
                 }
-                if (myfriends != null)
+                if (myfriends.Count()!=0)
                 {
-                var friend = myfriends.FirstOrDefault(f => f.OwnId == item.Id || f.YourFriendId == item.Id);
-                if (friend != null)
-                {
-                    item.IsFriend = true;
-                }
+                    var friend =myfriends.FirstOrDefault(f => f.OwnId == item.Id || f.YourFriendId == item.Id);
+                    if (friend != null)
+                    {
+                        item.IsFriend = true;
+                    }
                 }
             }
 

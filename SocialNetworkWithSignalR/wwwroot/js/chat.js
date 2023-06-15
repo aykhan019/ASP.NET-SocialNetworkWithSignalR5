@@ -25,6 +25,7 @@ connection.on("Disconnect", function (info) {
 
 connection.on("ReceiveNotification", function () {
     GetMyRequests();
+    GetAllUsers();
 })
 
 

@@ -41,7 +41,7 @@ function DeclineRequest(id,senderId) {
 }
 
 
-function AcceptRequest(id, requestId) {
+function AcceptRequest(id,id2, requestId) {
     $.ajax({
         url: `/Home/AcceptRequest?userId=` + id + "&requestId=" + requestId,
         method: "GET",
@@ -49,7 +49,9 @@ function AcceptRequest(id, requestId) {
             let item = `<div class="alert alert-success">
         You accept request successfully.
 </div>`;
+            GetAllUsers();
             SendFollowCall(id);
+            SendFollowCall(id2);
             GetMyRequests();
             GetAllUsers();
             $("#request").html(item);
@@ -89,7 +91,7 @@ function GetMyRequests() {
             for (var i = 0; i < data.length; i++) {
                 if (data[i].status == "Request") {
                     subContent = `<div class='card-body'>
-                    <button onclick="AcceptRequest('${data[i].senderId}',${data[i].id})" class='btn btn-success'>Accept</button>
+                    <button onclick="AcceptRequest('${data[i].senderId}','${data[i].receiverId}',${data[i].id})" class='btn btn-success'>Accept</button>
                     <button class='btn btn-outline-secondary' onclick="DeclineRequest(${data[i].id},'${data[i].senderId}')">Decline</button>
                         </div>`;
                 }
@@ -111,7 +113,8 @@ ${subContent}
 `;
                 content += item;
             }
-            console.log("worked");
+            console.log("Requests");
+            console.log(data);
             $("#requests").html(content);
         }
     })
@@ -120,7 +123,6 @@ ${subContent}
 GetMyRequests();
 
 function GetAllUsers() {
-
 
     $.ajax({
         url: "/Home/GetAllUsers",
