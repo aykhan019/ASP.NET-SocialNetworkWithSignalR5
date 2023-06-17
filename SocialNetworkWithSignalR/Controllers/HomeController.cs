@@ -31,6 +31,13 @@ namespace SocialNetworkWithSignalR.Controllers
             return View();
         }
 
+        public IActionResult Unfollow(string id)
+        {
+            var results = _dbContext.Friends.Where(f => f.OwnId == id || f.YourFriendId == id).ToArray();
+            _dbContext.Friends.RemoveRange(results);
+            _dbContext.SaveChanges();
+            return Ok();
+        }
         public async Task<IActionResult> SendFollow(string id)
         {
             var sender = await _userManager.GetUserAsync(HttpContext.User);
