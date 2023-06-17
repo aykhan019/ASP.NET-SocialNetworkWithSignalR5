@@ -17,7 +17,6 @@ function SendRequest(id) {
             $("#request").html(item);
         },
         error: function (err) {
-            console.log(err);
         }
     })
 }
@@ -28,7 +27,6 @@ function UnFollowCall(id) {
         url: "/Home/Unfollow/" + id,
         method: "GET",
         success: function (data) {
-            console.log("SUCCESSFULLY UNFOLLOWED");
             GetMyRequests();
             GetAllUsers();
             SendFollowCall(id);
@@ -52,7 +50,6 @@ function DeclineRequest(id,senderId) {
             $("#request").html(item);
         },
         error: function (err) {
-            console.log(err);
         }
     })
 }
@@ -74,7 +71,6 @@ function AcceptRequest(id,id2, requestId) {
             $("#request").html(item);
         },
         error: function (err) {
-            console.log(err);
         }
     })
 }
@@ -91,11 +87,36 @@ function DeleteRequest(id, requestId) {
             $("#request").html("");
         },
         error: function (err) {
-            console.log(err);
         }
     })
 }
 
+function GetMessages(id) {
+    alert('Call messages' + id);
+
+    $.ajax({
+        url: "/Home/GetAllMessages/" + id,
+        method: "GET",
+        success: function (data) {
+            let content = "";
+            for (var i = 0; i < data.length; i++) {
+                let item = `<section style='display:flex;'>
+                        <h4>
+                            ${data[i].content}
+                            </h4>
+                            <h6>
+                                ${data[i].dateTime}
+                            </h6>
+                        </section>`;
+                content += item;
+            }
+            console.log('Messages');
+            console.log(data);
+            $("#currentMessages").html(content);
+        }
+    })
+  
+}
 
 function GetMyRequests() {
     $.ajax({
@@ -146,17 +167,22 @@ function GetFriends() {
         url: "/Home/GetMyFriends",
         method: "GET",
         success: function (data) {
-            console.log(data);
             let content = "";
             for (var i = 0; i < data.length; i++) {
                 let css = 'border:3px solid springgreen';
                 if (!data[i].yourFriend.isOnline) {
                     css = 'border:3px solid red';
                 }
-                let item = `<section style='display:flex;'>
+                let item = `<section style="display:flex;width:300px;border:2px solid springgreen;margin-top:10px;
+padding:15px;
+border-radius:15px;">
         <img style='width:60px;height:60px;border-radius:50%;${css}' src='/images/${data[i].yourFriend.imageUrl}'/>
-       <h4>${data[i].yourFriend.userName}</h4>
-</section>`
+<section style="margin-left:20px;" >
+<h4>${data[i].yourFriend.userName}</h4>
+<a class='btn btn-outline-success mt-2 mx-auto'  href='/Home/GoChat/${data[i].yourFriendId}' >Go Chat</a>
+</section>
+</section>
+   `
                 content += item;
             }
 
@@ -166,13 +192,14 @@ function GetFriends() {
 
 }
 
+
+
 function GetAllUsers() {
 
     $.ajax({
         url: "/Home/GetAllUsers",
         method: "GET",
         success: function (data) {
-            console.log(data);
             let content = "";
             for (var i = 0; i < data.length; i++) {
                 let disconnectDate = new Date(data[i].disConnectTime);

@@ -31,6 +31,61 @@ namespace SocialNetworkWithSignalR.Controllers
             return View();
         }
 
+        public async Task<IActionResult> GoChat(string id)
+        {
+            var users = await _userManager.Users.ToListAsync();
+
+            var user=await _userManager.GetUserAsync(HttpContext.User);
+            var currentUser = users.FirstOrDefault(u => u.Id == user.Id);
+
+            var chats = await _dbContext.Chats.Include(nameof(Chat.Messages)).Include(nameof(Chat.Receiver)).ToListAsync();
+            var currentChat = chats.FirstOrDefault(c => c.SenderId == user.Id && c.ReceiverId == id);
+            
+            if (currentChat == null)
+            {
+                currentChat = new Chat
+                {
+                    ReceiverId = id,
+                    SenderId = user.Id,
+                    Messages = new List<Message>(),
+                };
+
+                await _dbContext.Chats.AddAsync(currentChat);
+                await _dbContext.SaveChangesAsync();
+
+                var currentChat2 = new Chat
+                {
+                    ReceiverId = user.Id,
+                    SenderId = id,
+                    Messages = new List<Message>(),
+                };
+                await _dbContext.Chats.AddAsync(currentChat2);
+                await _dbContext.SaveChangesAsync();
+            }
+
+            chats = await _dbContext.Chats.Include(nameof(Chat.Messages)).Include(nameof(Chat.Receiver)).ToListAsync();
+
+            currentChat.Messages= await _dbContext.Messages.Where(m => m.SenderId == user.Id && m.ReceiverId == id
+            || m.SenderId == id && m.ReceiverId == user.Id).OrderBy(m => m.DateTime).ToListAsync();
+
+            var model = new ChatViewModel
+            {
+                CurrentChat = currentChat,
+                Chats = chats.Where(c=>c.SenderId==user.Id).ToList(),
+            };
+
+            return View(model);
+        }
+
+        public async Task<IActionResult> GetAllMessages(string id)
+        {
+            var user = await _userManager.GetUserAsync(HttpContext.User);
+            var messages = await _dbContext.Messages.Where(m=>m.SenderId==user.Id && m.ReceiverId==id 
+            || m.SenderId == id && m.ReceiverId == user.Id).OrderBy(m=>m.DateTime).ToListAsync();
+
+            return Ok(messages);
+        }
+
         public IActionResult Unfollow(string id)
         {
             var results = _dbContext.Friends.Where(f => f.OwnId == id || f.YourFriendId == id).ToArray();

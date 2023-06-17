@@ -54,5 +54,6 @@ namespace SocialNetworkWithSignalR.Hubs
             await Clients.Users(new String[] { id }).SendAsync("ReceiveNotification2");
         }
         
+
     }
 }

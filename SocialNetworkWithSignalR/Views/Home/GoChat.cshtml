@@ -1,0 +1,62 @@
+﻿﻿
+@model ChatViewModel
+
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" />
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-3">
+            @foreach (var item in Model.Chats)
+            {
+                <div style="display:flex;cursor:pointer;width:300px;border:2px solid springgreen;margin-top:10px;
+padding:15px;
+border-radius:15px;">
+                    <img style="width:70px;height:70px;border-radius:50%;" src="\images\@item.Receiver.ImageUrl" alt="avatar">
+                    <section style="margin-left:20px;">
+                        <h4>@item.Receiver.UserName</h4>
+                        @if (@item.Receiver.IsOnline)
+                        {
+                            <h5 style="color:springgreen;">Online</h5>
+                        }
+                        else
+                        {
+                            <h5 style="color:red;">Not Available</h5>
+                        }
+                    </section>
+                </div>
+            }
+        </div>
+        <div class="col-md-9">
+            <h1>Click Chat to see chat messages</h1>
+            <div id="currentMessages">
+                @foreach (var message in Model.CurrentChat.Messages)
+                {
+                    <section style='display:flex;'>
+                    @if(message.ReceiverId==Model.CurrentChat.ReceiverId){
+                        <span>Receiver : </span>
+                    }
+                    else{
+                            <span>Sender : </span>
+                    }
+                        <h4>
+                            @message.Content
+                        </h4>
+                        <h6>
+                            @message.DateTime.ToLongDateString()
+                        </h6>
+                    </section>
+                }
+            </div>
+            <section>
+                <input type="text"/>
+                <a class="btn btn-primary">Send Message</a>
+            </section>
+        </div>
+    </div>
+</div>
+
+
+
+<script src="~/js/signalr/dist/browser/signalr.js"></script>
+<script src="~/js/chat.js"></script>
+<script src="~/js/site.js"></script>
