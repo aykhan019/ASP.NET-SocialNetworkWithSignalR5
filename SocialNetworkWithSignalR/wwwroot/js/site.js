@@ -37,6 +37,29 @@ function UnFollowCall(id) {
     })
 }
 
+function SendMessage(receiverId, senderId) {
+
+    let content = document.getElementById('message-input');
+
+    let obj = {
+        receiverId: receiverId,
+        senderId: senderId,
+        content: content.value
+    };
+
+    $.ajax({
+        url: `/Home/AddMessage`,
+        method: "POST",
+        data:obj,
+        success: function (data) {
+            GetMessageCall(receiverId, senderId);
+            content.value = "";
+        },
+        error: function (err) {
+        }
+    })
+}
+
 function DeclineRequest(id,senderId) {
     $.ajax({
         url: `/Home/DeclineRequest/${id}`,
@@ -91,26 +114,38 @@ function DeleteRequest(id, requestId) {
     })
 }
 
-function GetMessages(id) {
-    alert('Call messages' + id);
-
+function GetMessages(receiverId,senderId) {
     $.ajax({
-        url: "/Home/GetAllMessages/" + id,
+        url: `/Home/GetAllMessages?receiverId=${receiverId}&senderId=${senderId}`,
         method: "GET",
         success: function (data) {
             let content = "";
             for (var i = 0; i < data.length; i++) {
-                let item = `<section style='display:flex;'>
-                        <h4>
+                if (receiverId == data[i].receiverId) {
+                    let item = `<section   style='display:flex;margin-top:25px;border:2px solid springgreen;
+margin-left:100px;border-radius:20px 0 0 20px;padding:20px;width:50%;'>
+                        <h5>
                             ${data[i].content}
-                            </h4>
-                            <h6>
+                            </h5>
+                            <p>
                                 ${data[i].dateTime}
-                            </h6>
+                            </p>
                         </section>`;
-                content += item;
+                    content += item;
+                }
+                else { 
+                    let item = `<section    style='display:flex;margin-top:25px;border:2px solid springgreen;
+margin-left:0px;border-radius:0 20px 20px 0;width:50%;padding:20px;'>
+                        <h5>
+                            ${data[i].content}
+                            </h5>
+                            <p>
+                                ${data[i].dateTime}
+                            </p>
+                        </section>`;
+                    content += item;
+                }
             }
-            console.log('Messages');
             console.log(data);
             $("#currentMessages").html(content);
         }
