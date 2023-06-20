@@ -38,6 +38,12 @@ function UnFollowCall(id) {
 }
 
 function SendMessage(receiverId, senderId) {
+    //console.log("HERE"); \
+    //console.
+    //const audioUrl = window.location.origin + '/simple-notification-152054.mp3';
+    //const audio = new Audio(audioUrl);
+    //audio.play();
+    playSound();
 
     let content = document.getElementById('message-input');
 
@@ -58,6 +64,30 @@ function SendMessage(receiverId, senderId) {
         error: function (err) {
         }
     })
+}
+
+function playSound() {
+    // Create an AudioContext instance
+    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+    // Define the frequency and duration of the tone
+    const frequency = 800; // Frequency in Hz
+    const duration = 200; // Duration in milliseconds
+
+    // Create an OscillatorNode
+    const oscillator = audioContext.createOscillator();
+    oscillator.frequency.value = frequency;
+
+    // Connect the oscillator to the audio output
+    oscillator.connect(audioContext.destination);
+
+    // Start the oscillator
+    oscillator.start();
+
+    // Stop the oscillator after the specified duration
+    setTimeout(() => {
+        oscillator.stop();
+    }, duration);
 }
 
 function DeclineRequest(id,senderId) {

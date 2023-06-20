@@ -7,15 +7,18 @@ namespace SocialNetworkWithSignalR.Hubs
 {
     public class ChatHub:Hub
     {
+
+        private readonly IWebHostEnvironment _hostEnvironment;
         private UserManager<CustomIdentityUser> _userManager;
         private IHttpContextAccessor _contextAccessor;
         private CustomIdentityDbContext _context;
 
-        public ChatHub(UserManager<CustomIdentityUser> userManager, IHttpContextAccessor contextAccessor, CustomIdentityDbContext context)
+        public ChatHub(UserManager<CustomIdentityUser> userManager, IHttpContextAccessor contextAccessor, CustomIdentityDbContext context, IWebHostEnvironment hostEnvironment)
         {
             _userManager = userManager;
             _contextAccessor = contextAccessor;
             _context = context;
+            _hostEnvironment = hostEnvironment;
         }
 
         public async override Task OnConnectedAsync()
@@ -53,6 +56,10 @@ namespace SocialNetworkWithSignalR.Hubs
         public async Task GetMessages(string receiverId,string senderId)
         {
             await Clients.Users(new String[] { receiverId, senderId }).SendAsync("ReceiveMessages", receiverId,senderId);
+            // Create a SoundPlayer instance with the audio file path
+            //string wwwrootPath = _hostEnvironment.WebRootPath;
+            //string filePath = Path.Combine(wwwrootPath, "simple-notification-152054.mp3");
+            Console.Beep(800, 200);
         }
         public async Task DeclineNotification(string id)
         {

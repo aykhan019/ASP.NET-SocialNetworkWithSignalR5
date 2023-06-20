@@ -1,5 +1,8 @@
 ﻿﻿
 @model ChatViewModel
+@using Microsoft.AspNetCore.Identity
+@using SocialNetworkWithSignalR.Entities;
+@inject UserManager<CustomIdentityUser> UserManager
 
 <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" />
 
@@ -31,7 +34,7 @@ border-radius:15px;">
         </div>
         <div class="col-md-9">
             <h1>Click Chat to see chat messages</h1>
-            <div id="currentMessages">
+            <div id="currentMessages" style="max-height:80vh;height:80vh; overflow-y: scroll;">
                 @foreach (var message in Model.CurrentChat.Messages)
                 {
                     @if (message.ReceiverId == Model.CurrentChat.ReceiverId)
@@ -39,6 +42,7 @@ border-radius:15px;">
                         <section style='display:flex;margin-top:25px;border:2px solid springgreen;
 margin-left:100px;border-radius:20px 0 0 20px;padding:20px;width:50%;'>
                             <h5>
+                                
                                 @message.Content
                             </h5>
                             <p>
